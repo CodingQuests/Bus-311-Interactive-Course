@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Chapter 15 · How Firms Raise Capital</title>
+<style>
+  :root{
+    --bg:#0f1116; --panel:#141821; --sunken:#0b0e14;
+    --text:#ffffff; --muted:#a5b3d9; --accent:#7aa2f7; --good:#4ade80; --bad:#f87171; --warn:#facc15;
+    --card:#0f1522; --cardEdge:#1b2233; --chip:#192033;
+    --success:#34d399; --danger:#f87171;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:linear-gradient(180deg,var(--bg),#0c0f15 50%, var(--bg));
+    color:var(--text); font:15px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    display:flex; gap:0;
+  }
+  /* Sidebar */
+  .sidebar{
+    width:280px; background:var(--panel); border-right:1px solid #1d2332; padding:18px 12px; position:sticky; top:0; height:100vh; overflow:auto;
+  }
+  .brand{display:flex; align-items:center; gap:10px; padding:6px 10px 14px; border-bottom:1px solid #1c2230; margin-bottom:14px}
+  .brand .dot{width:10px; height:10px; border-radius:50%; background:conic-gradient(var(--accent), #8bd5ff)}
+  .brand h1{font-size:16px; margin:0; letter-spacing:.3px; color:#ffffff}
+  .tablist{display:flex; flex-direction:column; gap:8px; margin-top:10px}
+  .tabbtn{
+    text-align:left; width:100%; border:1px solid #20283a; background:var(--sunken);
+    color:var(--text); padding:10px 12px; border-radius:10px; cursor:pointer; transition:.15s ease;
+  }
+  .tabbtn:hover{border-color:#2a3550; transform:translateY(-1px)}
+  .tabbtn.active{background:#122038; border-color:#2b3f6b; box-shadow:0 0 0 2px #1f2a44 inset}
+  .small{color:var(--muted); font-size:12px}
+
+  /* Main */
+  .main{flex:1; min-width:0; padding:24px; overflow:auto}
+  .hero{
+    background:radial-gradient(1200px 400px at 20% -20%, #203255 0%, transparent 60%),
+               radial-gradient(800px 300px at 110% -30%, #1a263f 0%, transparent 70%);
+    border:1px solid #1c2436; border-radius:14px; padding:20px; margin-bottom:18px;
+  }
+  h2{margin:0 0 10px 0; font-size:22px; color:#ffffff}
+  h3{margin:22px 0 8px; font-size:18px; color:#ffffff}
+  p{margin:8px 0; color:#ffffff}
+  .chip{display:inline-block; background:var(--chip); border:1px solid #24304a; color:#ffffff; padding:4px 8px; border-radius:999px; font-size:12px; margin:2px 4px 2px 0}
+  .grid{display:grid; gap:14px}
+  .grid.cols-2{grid-template-columns:repeat(auto-fit, minmax(280px,1fr))}
+  .panel{background:var(--panel); border:1px solid #1c2436; border-radius:14px; padding:16px}
+  .callout{border-left:3px solid var(--accent); background:#0f1728; padding:10px 12px; border-radius:8px; color:#ffffff}
+  .katex{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
+  code, .monospace{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size:13px; color:#ffffff}
+  .muted{color:var(--muted)}
+
+  /* Cards */
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px}
+  .qcard{
+    perspective:1000px; height:150px;
+  }
+  .q-inner{position:relative; height:100%; transform-style:preserve-3d; transition:transform .55s cubic-bezier(.2,.7,.2,1)}
+  .qcard:hover .q-inner{transform:rotateY(180deg)}
+  .face{
+    position:absolute; inset:0; backface-visibility:hidden; background:var(--card); border:1px solid var(--cardEdge);
+    border-radius:14px; padding:14px; display:flex; align-items:center; justify-content:center; text-align:center; color:#ffffff
+  }
+  .face.back{transform:rotateY(180deg); background:#0f1626}
+  .face strong{color:#ffffff}
+
+  /* MCQs */
+  .mcq{background:var(--panel); border:1px solid #1c2436; border-radius:14px; padding:16px; margin:10px 0}
+  .mcq h4{margin:0 0 10px 0; color:#ffffff}
+  .opt{display:block; padding:8px 10px; margin:6px 0; border:1px solid #20283a; border-radius:10px; cursor:pointer; color:#ffffff}
+  .opt:hover{background:#101728}
+  .correct{border-color:#275b3c; background:#0f1b17}
+  .wrong{border-color:#5b2727; background:#1b0f10}
+  .explain{display:none; margin-top:8px; color:#ffffff}
+  .spacer{height:8px}
+  .solutions-block{display:none; padding:10px; border-top:1px dashed #2b3752; margin-top:8px; color:#ffffff}
+  .btn{background:#13213a; border:1px solid #273758; color:#ffffff; padding:8px 10px; border-radius:10px; cursor:pointer}
+  .btn:hover{background:#152747}
+  .btn.ghost{background:transparent; color:#ffffff; border:1px solid #1c2436}
+
+  /* Short Qs & Practice */
+  details{background:var(--sunken); border:1px solid #23304a; border-radius:12px; padding:10px 12px; margin:10px 0}
+  summary{cursor:pointer; font-weight:600; color:#ffffff}
+  .solve{margin-top:8px; color:#ffffff}
+  .tag{font-size:11px; padding:2px 6px; border:1px solid #2a3552; background:#101727; border-radius:999px; color:#ffffff; margin-left:6px}
+
+  /* Tabs */
+  .tabcontent{display:none}
+  .tabcontent.active{display:block; animation:fade .25s ease}
+  @keyframes fade{from{opacity:.5; transform:translateY(2px)} to{opacity:1; transform:none}}
+
+  /* Input styling */
+  input[type="number"], input[type="text"]{
+    background:#0b1329; color:#ffffff; border:1px solid #24305e; padding:.35rem .45rem; border-radius:8px; width:110px;
+  }
+
+  /* GAME STYLES */
+  .game-arena{text-align:center;max-width:800px;margin:0 auto}
+  .game-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+  .stat-card{background:linear-gradient(145deg,#0f1830,#1a2640);border:1px solid #1c2436;border-radius:12px;padding:1rem;text-align:center}
+  .stat-value{font-size:2rem;font-weight:700;color:var(--accent);margin:0}
+  .stat-label{font-size:.85rem;color:var(--muted);margin:.25rem 0 0}
+  .question-card{background:var(--card);border:2px solid #1c2436;border-radius:16px;padding:2rem;margin:1.5rem 0;min-height:200px;position:relative;overflow:hidden}
+  .question-card.correct{border-color:var(--success);background:linear-gradient(145deg,#0a1a0f,var(--card))}
+  .question-card.wrong{border-color:var(--danger);background:linear-gradient(145deg,#1a0a0a,var(--card))}
+  .question-text{font-size:1.25rem;font-weight:600;margin-bottom:1.5rem;line-height:1.4;color:#ffffff}
+  .answer-options{display:grid;gap:.75rem;max-width:500px;margin:0 auto}
+  .answer-btn{background:linear-gradient(145deg,#1a2640,#0f1830);border:2px solid #1c2436;color:#ffffff;padding:1rem;border-radius:12px;cursor:pointer;transition:all .2s;font-size:1rem;font-weight:500}
+  .answer-btn:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 12px rgba(122,162,247,.3)}
+  .answer-btn.correct{border-color:var(--success);background:linear-gradient(145deg,#0a1a0f,#1a4a2a)}
+  .answer-btn.wrong{border-color:var(--danger);background:linear-gradient(145deg,#1a0a0a,#4a1a1a)}
+  .timer-bar{height:6px;background:#1c2436;border-radius:3px;overflow:hidden;margin-bottom:1rem}
+  .timer-fill{height:100%;background:linear-gradient(90deg,var(--danger),#fbbf24,var(--success));transition:width .1s linear}
+  .streak-indicator{position:absolute;top:1rem;right:1rem;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a1020;padding:.5rem 1rem;border-radius:999px;font-weight:700;font-size:.9rem}
+  .game-over{text-align:center;padding:2rem}
+  .final-score{font-size:3rem;font-weight:700;color:var(--accent);margin:1rem 0}
+  .performance{margin:1.5rem 0}
+  .perf-item{display:inline-block;margin:.5rem 1rem;font-size:1.1rem;color:#ffffff}
+  .leaderboard{background:var(--card);border-radius:12px;padding:1.5rem;margin-top:1.5rem}
+  .lb-entry{display:flex;justify-content:space-between;padding:.75rem 0;border-bottom:1px solid #1c2436;color:#ffffff}
+  .lb-entry:last-child{border-bottom:none}
+  .difficulty-select{margin-bottom:1.5rem}
+  .diff-btn{margin:0 .5rem;padding:.75rem 1.5rem;border-radius:8px;cursor:pointer;border:2px solid #1c2436;background:var(--panel);color:#ffffff}
+  .diff-btn.active{border-color:var(--accent);background:linear-gradient(145deg,#8bd5ff,var(--accent));color:#0a1020}
+
+  /* Animations */
+  @keyframes bounce{0%,20%,50%,80%,100%{transform:translateY(0)}40%{transform:translateY(-10px)}60%{transform:translateY(-5px)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}10%,30%,50%,70%,90%{transform:translateX(-5px)}20%,40%,60%,80%{transform:translateX(5px)}}
+  .bounce{animation:bounce .5s ease}
+  .shake{animation:shake .5s ease}
+
+  @media (max-width:940px){
+    .sidebar{position:fixed; inset:0 auto 0 0; z-index:40; transform:translateX(-100%); transition:.2s ease}
+    .sidebar.show{transform:none}
+    .main{padding:16px}
+    .toggleNav{position:fixed; top:12px; left:12px; z-index:50}
+  }
+
+  /* Additional styling */
+  ul{color:#ffffff}
+  li{color:#ffffff; margin:.25rem 0}
+  .row{display:flex; flex-wrap:wrap; gap:.6rem; align-items:center; margin:8px 0}
+</style>
+</head>
+<body>
+  <button class="btn toggleNav" type="button" onclick="toggleNav()" aria-label="Toggle navigation">☰</button>
+  <aside class="sidebar" id="nav" aria-label="Lesson navigation">
+    <div class="brand"><span class="dot" aria-hidden="true"></span><h1>FIN 311 • Ch.15 How Firms Raise Capital</h1></div>
+    <div class="tablist" role="tablist">
+      <button class="tabbtn active" role="tab" aria-selected="true" onclick="showTab('review')">📘 Review</button>
+      <button class="tabbtn" role="tab" aria-selected="false" onclick="showTab('qcards')">🧠 Q-cards</button>
+      <button class="tabbtn" role="tab" aria-selected="false" onclick="showTab('mcqs')">📝 MCQs</button>
+      <button class="tabbtn" role="tab" aria-selected="false" onclick="showTab('shorts')">✍️ Short Questions</button>
+      <button class="tabbtn" role="tab" aria-selected="false" onclick="showTab('practice')">📊 Practice Problems</button>
+      <button class="tabbtn" role="tab" aria-selected="false" onclick="showTab('game')">🎮 Capital Challenge</button>
+      <div class="small" style="margin-top:10px">
+        Master how firms fund growth from start-up to public markets through interactive financing challenges.
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- REVIEW -->
+    <section id="review" class="tabcontent active" role="tabpanel">
+      <div class="hero">
+        <h2>Chapter 15 — How Firms Raise Capital</h2>
+        <div class="muted">How firms fund growth from start-up to public markets. Funding lifecycle and issuance processes.</div>
+        <div style="margin-top:10px">
+          <span class="chip">Bootstrapping</span><span class="chip">Venture Capital</span><span class="chip">IPO Process</span><span class="chip">Underwriting</span>
+          <span class="chip">Private Placement</span><span class="chip">PIPE</span><span class="chip">Private Equity</span><span class="chip">Bank Loans</span>
+        </div>
+      </div>
+
+      <div class="grid cols-2">
+        <div class="panel">
+          <h3>1) Core concepts</h3>
+          <ul>
+            <li><strong>Bootstrapping:</strong> founder savings, asset sales, friends & family, credit cards; tiny budgets until concept proven.</li>
+            <li><strong>Venture Capital (VC):</strong> pools money to fund seed/early growth. Risk reduction via staged financing, required personal investment, syndication across VC funds, and industry expertise. Exit via strategic sale, financial buyer (PE), or IPO.</li>
+            <li><strong>IPO process:</strong> choose bank; origination (registration & prospectus), underwriting (firm-commitment: bank buys the issue & bears price risk; best-efforts: issuer bears risk), book-building/road show, pricing, distribution, first-day trading, closing.</li>
+            <li><strong>Underwriter's spread:</strong> Offer price − price paid to issuer (e.g., 7%). Pays the street for risk, services, and distribution.</li>
+            <li><strong>IPO underpricing:</strong> offer < true/market value; "money left on the table" = (first-day close − offer) × shares sold. Helps ensure successful sale/liquidity but is costly to pre-IPO owners.</li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <h3>2) Financing options</h3>
+          <ul>
+            <li><strong>Cost of an IPO:</strong> (1) Underwriting spread, (2) out-of-pocket expenses (legal, accounting, SEC/printing, travel), (3) underpricing (opportunity cost).</li>
+            <li><strong>Seasoned equity offer (SEO/general cash offer):</strong> public firm sells new shares. Choice of competitive vs negotiated sale; shelf registration lets firms pre-register and "take down" when needed (speed & lower cost).</li>
+            <li><strong>Private markets:</strong> Private placements (sell to institutions; faster, flexible, often cheaper but with higher investor yield for illiquidity), PIPE (public company sells registered-later but initially restricted stock to an institution at a discount for speed).</li>
+            <li><strong>Private Equity (PE):</strong> buys controlling stakes, often via LBO (high leverage). Improves firms via governance, operating focus, and M&A; exits later by sale/IPO.</li>
+            <li><strong>Commercial bank loans:</strong> Prime-rate loans (revolving/short-term), and term loans (1–5+ yrs). Loan pricing model: k_L = PR + DRP + MAT where PR=prime rate, DRP=borrower default-risk premium, MAT=term premium.</li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <h3>3) Quick reference</h3>
+          <ul>
+            <li><strong>Firm-commitment</strong>: bank buys issue → bank bears price risk.</li>
+            <li><strong>Best-efforts</strong>: bank only places → issuer bears risk; fees on sold amount.</li>
+            <li><strong>First-day return</strong> ≈ (close − offer)/offer.</li>
+            <li><strong>Shelf</strong>: one filing for 2 years; pull "off the shelf" as needed.</li>
+            <li><strong>PIPE</strong>: fast cash, discounted price, restricted initially.</li>
+            <li><strong>Loan rate</strong>: add PR + credit spread + maturity adj.</li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <h3>4) Mini tool — IPO proceeds / "money on the table"</h3>
+          <div class="row">
+            <label style="color:#ffffff">Offer price <input id="offer" type="number" value="20" step="0.01"></label>
+            <label style="color:#ffffff">Shares (millions) <input id="shares" type="number" value="2" step="0.01"></label>
+            <label style="color:#ffffff">Spread % <input id="spread" type="number" value="7" step="0.01"></label>
+            <label style="color:#ffffff">1st-day close <input id="close" type="number" value="22" step="0.01"></label>
+            <button class="btn" onclick="ipoCalc()">Compute</button>
+          </div>
+          <p id="ipoOut" class="small muted">Ready.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Q-CARDS -->
+    <section id="qcards" class="tabcontent" role="tabpanel" aria-hidden="true">
+      <div class="panel">
+        <h3>Flip Q-cards — Chapter 15 core terms</h3>
+        <div class="cards">
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>Bootstrapping</strong></div>
+            <div class="face back">Seed funding from founders, friends/family, credit cards, asset sales; keep burn low until proof of concept.</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>VC staged financing — why?</strong></div>
+            <div class="face back">Reassess milestones; limit downside; provide options to continue, pivot, or stop.</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>Firm-commitment vs best-efforts</strong></div>
+            <div class="face back">Firm: bank buys entire issue, bears price risk. Best-efforts: bank only places; issuer bears risk.</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>Underwriter's spread</strong></div>
+            <div class="face back">Offer price − proceeds per share to issuer (≈ fee + risk premium).</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>Underpricing</strong></div>
+            <div class="face back">Offer below market; "money left on table" = (close−offer)×shares.</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>General cash offer (SEO)</strong></div>
+            <div class="face back">Public firm sells new securities to all investors; competitive or negotiated; can use shelf.</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>Shelf registration</strong></div>
+            <div class="face back">Pre-register securities for ~2 years; sell quickly when market windows open.</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>Private placement vs PIPE</strong></div>
+            <div class="face back">PP: private issuer → institutions; PIPE: public issuer sells restricted shares to a single/few institutions at a discount.</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>PE leveraged buyout (LBO)</strong></div>
+            <div class="face back">Buy control with heavy debt; improve ops/governance; exit later via sale/IPO.</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>Prime-rate loan</strong></div>
+            <div class="face back">Floating-rate line priced off bank prime; often for WC; bring to zero at year-end.</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>Term loan pricing</strong></div>
+            <div class="face back">k_L = PR + DRP + MAT, where MAT reflects yield-curve spread by maturity.</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>Road show / book-building</strong></div>
+            <div class="face back">Market & price discovery + investor education; gauge demand across price points.</div>
+          </div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MCQS -->
+    <section id="mcqs" class="tabcontent" role="tabpanel" aria-hidden="true">
+      <div class="panel">
+        <h3>MCQs — How Firms Raise Capital</h3>
+
+        <div class="mcq">
+          <h4>1) Why are traditional bank loans often unavailable to very new firms?</h4>
+          <label class="opt" data-correct="1"><input type="radio" name="q1">High risk & information asymmetry about cash flows</label>
+          <label class="opt"><input type="radio" name="q1">Banks cannot lend to firms without patents</label>
+          <label class="opt"><input type="radio" name="q1">VCs prohibit bank borrowing</label>
+          <div class="explain">Banks avoid start-ups due to risk, uncertain cash flows, and lack of credit history.</div>
+        </div>
+
+        <div class="mcq">
+          <h4>2) Which is bootstrapping?</h4>
+          <label class="opt" data-correct="1"><input type="radio" name="q2">Founder uses savings and a small friends-and-family round</label>
+          <label class="opt"><input type="radio" name="q2">PE fund leverages a buyout with bank debt</label>
+          <label class="opt"><input type="radio" name="q2">Firm issues shelf-registered bonds</label>
+          <div class="explain">Bootstrapping = self-funding with personal resources and friends/family.</div>
+        </div>
+
+        <div class="mcq">
+          <h4>3) VCs reduce risk by all except:</h4>
+          <label class="opt"><input type="radio" name="q3">Staged financing</label>
+          <label class="opt"><input type="radio" name="q3">Syndication</label>
+          <label class="opt" data-correct="1"><input type="radio" name="q3">Guaranteeing investors a fixed return</label>
+          <div class="explain">VCs don't guarantee returns; they manage risk via staging, syndication, & expertise.</div>
+        </div>
+
+        <div class="mcq">
+          <h4>4) Under a firm-commitment IPO, who bears the price risk?</h4>
+          <label class="opt" data-correct="1"><input type="radio" name="q4">Underwriter</label>
+          <label class="opt"><input type="radio" name="q4">Issuer</label>
+          <label class="opt"><input type="radio" name="q4">Retail investors</label>
+          <div class="explain">In firm-commitment the bank buys the issue, bearing inventory/price risk.</div>
+        </div>
+
+        <div class="mcq">
+          <h4>5) Underwriter's spread equals:</h4>
+          <label class="opt"><input type="radio" name="q5">Closing price − offer price</label>
+          <label class="opt" data-correct="1"><input type="radio" name="q5">Offer price − proceeds per share to issuer</label>
+          <label class="opt"><input type="radio" name="q5">Offer price − book value per share</label>
+          <div class="explain">Spread is the fee embedded in price per share.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SHORT QUESTIONS -->
+    <section id="shorts" class="tabcontent" role="tabpanel" aria-hidden="true">
+      <div class="panel">
+        <h3>Short Questions — applied scenarios</h3>
+
+        <details><summary><strong>S1) Firm-commitment IPO</strong> — Offer $20, shares 2.0m, spread 7%. What are proceeds to issuer and underwriter? <span class="tag">IPO</span></summary>
+          <div class="solve">
+            Issuer gets: $20×(1−0.07)×2.0m = <strong>$37.2m</strong>. Underwriter gross spread: $20×0.07×2.0m = <strong>$2.8m</strong>.
+          </div>
+        </details>
+
+        <details><summary><strong>S2) Underpricing cost</strong> — Use S1 but first-day close is $22. "Money left on the table"? <span class="tag">Underpricing</span></summary>
+          <div class="solve">
+            (22−20)×2.0m = <strong>$4.0m</strong>.
+          </div>
+        </details>
+
+        <details><summary><strong>S3) Best-efforts IPO</strong> — Offer $20 but average selling price realized is $19; spread is 7% of selling price; 2.0m shares sold. Net proceeds to issuer? <span class="tag">Best-efforts</span></summary>
+          <div class="solve">
+            Issuer nets 19×(1−0.07)×2.0m = 19×0.93×2.0m = <strong>$35.34m</strong>. Underwriter spread dollars =19×0.07×2.0m=<strong>$2.66m</strong>.
+          </div>
+        </details>
+
+        <details><summary><strong>S4) Total cost of IPO</strong> — Use S1 with out-of-pocket fees $0.3m and underpricing from S2. <span class="tag">IPO Cost</span></summary>
+          <div class="solve">
+            Total cost = spread 2.8 + fees 0.3 + underpricing 4.0 = <strong>$7.1m</strong>.
+          </div>
+        </details>
+
+        <details><summary><strong>S5) SEO (general cash offer)</strong> — Company raises $300m of common stock; spread 3.0%, out-of-pocket 0.4% of proceeds. What is the direct issuing cost %? <span class="tag">SEO</span></summary>
+          <div class="solve">
+            Direct cost % = 3.0% + 0.4% = <strong>3.4%</strong>. Dollars = 0.034×300 = <strong>$10.2m</strong> (excludes underpricing).
+          </div>
+        </details>
+
+        <details><summary><strong>S6) PIPE discount</strong> — Market $25; institution buys 10m shares at a 12% discount and registration occurs later. Cash to issuer? <span class="tag">PIPE</span></summary>
+          <div class="solve">
+            Price = 25×(1−0.12)=22.00. Cash = 22×10m= <strong>$220m</strong>. Implied discount cost (vs spot) = 3×10m= <strong>$30m</strong>.
+          </div>
+        </details>
+
+        <details><summary><strong>S7) Loan pricing</strong> — Prime 4.25%, DRP 3.00%, 5-yr Treasury 2.80%, 3-mo T-bill 1.00%. Find MAT and the 5-yr term loan rate. <span class="tag">Loan</span></summary>
+          <div class="solve">
+            MAT = 2.80 − 1.00 = 1.80%. Rate k_L = 4.25 + 3.00 + 1.80 = <strong>9.05%</strong>.
+          </div>
+        </details>
+
+        <details><summary><strong>S8) First-day return</strong> — Offer $18; close $20.25. First-day return (%)? <span class="tag">Returns</span></summary>
+          <div class="solve">
+            (20.25−18)/18 = 0.125 = <strong>12.5%</strong>.
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- PRACTICE PROBLEMS -->
+    <section id="practice" class="tabcontent" role="tabpanel" aria-hidden="true">
+      <div class="panel">
+        <h3>Practice Problems — with detailed solutions</h3>
+
+        <details><summary><strong>1) IPO cost analysis</strong> — Company goes public: offer price $25, 4M shares, 6% spread, $1.5M out-of-pocket costs, first-day close $28. Calculate all costs.</summary>
+          <div class="solve">
+            Gross proceeds = $25 × 4M = $100M<br/>
+            Underwriter spread = $100M × 6% = <strong>$6.0M</strong><br/>
+            Net proceeds to issuer = $100M - $6.0M = <strong>$94.0M</strong><br/>
+            Out-of-pocket costs = <strong>$1.5M</strong><br/>
+            Underpricing = ($28-$25) × 4M = <strong>$12.0M</strong><br/>
+            Total cost = $6.0M + $1.5M + $12.0M = <strong>$19.5M</strong>
+          </div>
+        </details>
+
+        <details><summary><strong>2) VC funding rounds</strong> — Startup needs $2M in Series A. VC values company at $6M pre-money. What's the post-money valuation and VC ownership %?</summary>
+          <div class="solve">
+            Pre-money valuation = <strong>$6M</strong><br/>
+            Investment = <strong>$2M</strong><br/>
+            Post-money valuation = $6M + $2M = <strong>$8M</strong><br/>
+            VC ownership = $2M ÷ $8M = <strong>25%</strong>
+          </div>
+        </details>
+
+        <details><summary><strong>3) Private placement vs public offering</strong> — Compare costs: Public offering with 4% spread + $2M expenses vs Private placement with 2% higher yield on $50M bond issue.</summary>
+          <div class="solve">
+            Public offering cost = $50M × 4% + $2M = <strong>$4.0M</strong><br/>
+            Private placement additional cost = $50M × 2% = $1.0M annually<br/>
+            If 5-year bond: PV of extra cost ≈ $1.0M × 5 = <strong>$5.0M</strong> (simplified)<br/>
+            Public offering is cheaper despite up-front costs.
+          </div>
+        </details>
+
+        <details><summary><strong>4) LBO analysis</strong> — PE firm buys company for $100M using $30M equity, $70M debt. After 5 years, sells for $180M with $50M debt remaining. Calculate equity return.</summary>
+          <div class="solve">
+            Initial equity investment = <strong>$30M</strong><br/>
+            Sale proceeds to equity = $180M - $50M = <strong>$130M</strong><br/>
+            Total return = $130M ÷ $30M = <strong>4.33x</strong><br/>
+            Annualized return = (4.33)^(1/5) - 1 = <strong>34.0%</strong>
+          </div>
+        </details>
+
+        <details><summary><strong>5) Shelf registration</strong> — Company files shelf registration for $500M. Takes down $100M immediately, $200M after 6 months, $200M after 18 months. Compare to separate offerings.</summary>
+          <div class="solve">
+            Shelf registration benefits:<br/>
+            • Speed: immediate access to capital when needed<br/>
+            • Lower costs: one SEC filing vs three separate filings<br/>
+            • Market timing: can issue when conditions favorable<br/>
+            • Flexibility: can adjust offering sizes based on market demand<br/>
+            Total cost savings estimated at <strong>0.5-1.0%</strong> of total issuance.
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- CAPITAL CHALLENGE GAME -->
+    <section id="game" class="tabcontent" role="tabpanel" aria-hidden="true">
+      <div class="panel">
+        <h1>🎮 Capital Raising Challenge</h1>
+        <p class="muted">Master how firms raise capital! From bootstrapping to IPOs, test your knowledge of financing strategies.</p>
+        
+        <div class="game-arena">
+          <!-- Game Start Screen -->
+          <div id="game-start" class="game-over">
+            <h2>💰 Ready to Raise Capital?</h2>
+            <div class="difficulty-select">
+              <h3>Choose Your Funding Stage:</h3>
+              <button class="diff-btn active" data-diff="easy">Startup Founder<br><small>15s • Basics</small></button>
+              <button class="diff-btn" data-diff="medium">Growth CEO<br><small>11s • IPO process</small></button>
+              <button class="diff-btn" data-diff="hard">Investment Banker<br><small>8s • Complex deals</small></button>
+            </div>
+            <button class="btn" onclick="startGame()">🚀 Start Fundraising</button>
+            
+            <!-- Leaderboard -->
+            <div class="leaderboard">
+              <h3>🏆 Fundraising Champions</h3>
+              <div id="leaderboard-list">
+                <div class="lb-entry"><span>No deals yet!</span><span>Start your first fundraise!</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Game Stats -->
+          <div id="game-stats" class="game-stats" style="display:none">
+            <div class="stat-card">
+              <div class="stat-value" id="score">0</div>
+              <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="streak">0</div>
+              <div class="stat-label">Streak</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="correct">0</div>
+              <div class="stat-label">Funded</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="remaining">12</div>
+              <div class="stat-label">Remaining</div>
+            </div>
+          </div>
+
+          <!-- Question Card -->
+          <div id="question-container" style="display:none">
+            <div class="timer-bar">
+              <div class="timer-fill" id="timer-fill"></div>
+            </div>
+            
+            <div class="question-card" id="question-card">
+              <div class="streak-indicator" id="streak-display" style="display:none">🔥 <span id="streak-num">0</span></div>
+              <div class="question-text" id="question-text"></div>
+              <div class="answer-options" id="answer-options"></div>
+            </div>
+            
+            <button class="btn ghost" onclick="skipQuestion()">⏭️ Skip</button>
+          </div>
+
+          <!-- Game Over Screen -->
+          <div id="game-over" class="game-over" style="display:none">
+            <h2>💼 Fundraising Complete!</h2>
+            <div class="final-score" id="final-score">0</div>
+            <div class="performance">
+              <div class="perf-item">✅ Funded: <strong id="final-correct">0</strong></div>
+              <div class="perf-item">❌ Rejected: <strong id="final-wrong">0</strong></div>
+              <div class="perf-item">🔥 Best Round: <strong id="final-streak">0</strong></div>
+              <div class="perf-item">⚡ Avg: <strong id="avg-time">0s</strong></div>
+            </div>
+            <div class="performance-message" id="performance-msg"></div>
+            <button class="btn" onclick="resetGame()">🔄 New Round</button>
+            <button class="btn ghost" onclick="showLeaderboard()">📈 Leaderboard</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+<script>
+  function toggleNav(){ document.getElementById('nav').classList.toggle('show'); }
+  function showTab(id){
+    document.querySelectorAll('.tabbtn').forEach(b=>{ b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+    document.querySelectorAll('.tabcontent').forEach(s=>{ s.classList.remove('active'); s.setAttribute('aria-hidden','true'); });
+    document.querySelector('[onclick="showTab(\''+id+'\')"]').classList.add('active');
+    document.querySelector('[onclick="showTab(\''+id+'\')"]').setAttribute('aria-selected','true');
+    document.getElementById(id).classList.add('active');
+    document.getElementById(id).setAttribute('aria-hidden','false');
+    if(innerWidth<940) document.getElementById('nav').classList.remove('show');
+  }
+
+  // MCQ interactions
+  document.querySelectorAll('.mcq').forEach(block=>{
+    block.querySelectorAll('.opt').forEach(opt=>{
+      opt.addEventListener('click',()=>{
+        block.querySelectorAll('.opt').forEach(o=>{ o.classList.remove('correct','wrong'); });
+        if(opt.dataset.correct==='1'){ opt.classList.add('correct'); } else { opt.classList.add('wrong'); }
+        block.querySelector('.explain').style.display='block';
+      });
+    });
+  });
+
+  // Difficulty buttons
+  document.querySelectorAll('.diff-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Capital Raising Speed Challenge Game
+  let gameState = {
+    score: 0,
+    streak: 0,
+    bestStreak: 0,
+    correct: 0,
+    wrong: 0,
+    currentQuestion: 0,
+    totalQuestions: 12,
+    difficulty: 'easy',
+    timer: null,
+    timeLeft: 15,
+    questionStartTime: 0,
+    responseTimes: []
+  };
+
+  const difficulties = {
+    easy: { time: 15, scoreMultiplier: 1, streakBonus: 15 },
+    medium: { time: 11, scoreMultiplier: 1.5, streakBonus: 20 },
+    hard: { time: 8, scoreMultiplier: 2.2, streakBonus: 30 }
+  };
+
+  // Capital Raising Question bank - Chapter 15 focus
+  const questions = [
+    {
+      text: "Why can't most startups get traditional bank loans?",
+      answers: ["Banks don't lend to tech companies", "High risk & information asymmetry", "Startups have no collateral", "Interest rates too high"],
+      correct: 1,
+      explanation: "Banks avoid startups due to risk, uncertain cash flows, and lack of credit history"
+    },
+    {
+      text: "In firm-commitment underwriting, who bears the price risk?",
+      answers: ["Issuer", "Underwriter", "Investors", "Market makers"],
+      correct: 1,
+      explanation: "Underwriter buys entire issue and bears inventory/price risk"
+    },
+    {
+      text: "IPO offer $20, close $23, 2M shares. Money left on table:",
+      answers: ["$4M", "$6M", "$2M", "$8M"],
+      correct: 1,
+      explanation: "($23-$20) × 2M = $6M in underpricing cost"
+    },
+    {
+      text: "Underwriter's spread equals:",
+      answers: ["Close price - offer price", "Offer price - proceeds to issuer", "Market cap - book value", "Revenue - costs"],
+      correct: 1,
+      explanation: "Spread = gross proceeds per share - net proceeds to issuer"
+    },
+    {
+      text: "Best-efforts underwriting means:",
+      answers: ["Bank buys entire issue", "Bank tries to sell; issuer bears risk", "Only institutional investors", "Higher fees guaranteed"],
+      correct: 1,
+      explanation: "Bank acts as agent; issuer bears unsold inventory risk"
+    },
+    {
+      text: "Shelf registration advantage:",
+      answers: ["No SEC filing needed", "Multiple takedowns from one document", "Guaranteed pricing", "Retail-only distribution"],
+      correct: 1,
+      explanation: "Pre-register for speed and timing flexibility"
+    },
+    {
+      text: "PIPE transaction characteristics:",
+      answers: ["Public offering to all", "Private placement to institutions at discount", "Employee stock options", "Rights to existing shareholders"],
+      correct: 1,
+      explanation: "Private Investment in Public Equity - restricted shares at discount"
+    },
+    {
+      text: "VC staged financing reduces risk by:",
+      answers: ["Guaranteeing returns", "Reassessing at milestones", "Eliminating competition", "Fixed valuations"],
+      correct: 1,
+      explanation: "VCs can stop, pivot, or continue based on progress"
+    },
+    {
+      text: "Private equity LBO strategy:",
+      answers: ["Buy minority stakes", "Control + leverage + operational improvements", "Only tech investments", "Public market trading"],
+      correct: 1,
+      explanation: "PE uses debt to buy control, improve operations, then exit"
+    },
+    {
+      text: "Loan rate = Prime 5% + DRP 3% + MAT 1.5%. Total rate:",
+      answers: ["8.5%", "9.5%", "6.5%", "11%"],
+      correct: 1,
+      explanation: "5% + 3% + 1.5% = 9.5% (additive model)"
+    },
+    {
+      text: "Which is NOT a direct IPO cash cost?",
+      answers: ["Underwriting spread", "Legal fees", "Underpricing", "Accounting fees"],
+      correct: 2,
+      explanation: "Underpricing is opportunity cost, not cash outlay"
+    },
+    {
+      text: "Bootstrapping typically involves:",
+      answers: ["VC funding", "Founder savings + F&F", "Bank loans", "IPO proceeds"],
+      correct: 1,
+      explanation: "Self-funding with personal resources and friends/family"
+    }
+  ];
+
+  function startGame() {
+    const selectedDiff = document.querySelector('.diff-btn.active').dataset.diff;
+    gameState.difficulty = selectedDiff;
+    gameState.timeLeft = difficulties[selectedDiff].time;
+    
+    // Reset game state
+    gameState.score = 0;
+    gameState.streak = 0;
+    gameState.bestStreak = 0;
+    gameState.correct = 0;
+    gameState.wrong = 0;
+    gameState.currentQuestion = 0;
+    gameState.responseTimes = [];
+    
+    // Shuffle questions
+    gameState.questions = [...questions].sort(() => Math.random() - 0.5).slice(0, gameState.totalQuestions);
+    
+    // Show game UI
+    document.getElementById('game-start').style.display = 'none';
+    document.getElementById('game-stats').style.display = 'grid';
+    document.getElementById('question-container').style.display = 'block';
+    
+    updateStats();
+    showNextQuestion();
+  }
+
+  function updateStats() {
+    document.getElementById('score').textContent = gameState.score.toLocaleString();
+    document.getElementById('streak').textContent = gameState.streak;
+    document.getElementById('correct').textContent = gameState.correct;
+    document.getElementById('remaining').textContent = gameState.totalQuestions - gameState.currentQuestion;
+  }
+
+  function showNextQuestion() {
+    if (gameState.currentQuestion >= gameState.totalQuestions) {
+      endGame();
+      return;
+    }
+    
+    const question = gameState.questions[gameState.currentQuestion];
+    const questionCard = document.getElementById('question-card');
+    
+    // Reset card styling
+    questionCard.className = 'question-card';
+    
+    // Set question text
+    document.getElementById('question-text').textContent = question.text;
+    
+    // Create answer options
+    const optionsContainer = document.getElementById('answer-options');
+    optionsContainer.innerHTML = '';
+    
+    question.answers.forEach((answer, index) => {
+      const button = document.createElement('button');
+      button.className = 'answer-btn';
+      button.textContent = answer;
+      button.onclick = () => selectAnswer(index);
+      optionsContainer.appendChild(button);
+    });
+    
+    // Update streak display
+    const streakDisplay = document.getElementById('streak-display');
+    if (gameState.streak > 0) {
+      streakDisplay.style.display = 'block';
+      document.getElementById('streak-num').textContent = gameState.streak;
+    } else {
+      streakDisplay.style.display = 'none';
+    }
+    
+    // Start timer
+    startTimer();
+    gameState.questionStartTime = Date.now();
+  }
+
+  function startTimer() {
+    gameState.timeLeft = difficulties[gameState.difficulty].time;
+    updateTimerBar();
+    
+    gameState.timer = setInterval(() => {
+      gameState.timeLeft--;
+      updateTimerBar();
+      
+      if (gameState.timeLeft <= 0) {
+        clearInterval(gameState.timer);
+        selectAnswer(-1); // Time up = wrong answer
+      }
+    }, 1000);
+  }
+
+  function updateTimerBar() {
+    const maxTime = difficulties[gameState.difficulty].time;
+    const percentage = (gameState.timeLeft / maxTime) * 100;
+    document.getElementById('timer-fill').style.width = percentage + '%';
+  }
+
+  function selectAnswer(selectedIndex) {
+    clearInterval(gameState.timer);
+    
+    const responseTime = (Date.now() - gameState.questionStartTime) / 1000;
+    gameState.responseTimes.push(responseTime);
+    
+    const question = gameState.questions[gameState.currentQuestion];
+    const isCorrect = selectedIndex === question.correct;
+    const questionCard = document.getElementById('question-card');
+    const answerButtons = document.querySelectorAll('.answer-btn');
+    
+    // Disable all buttons
+    answerButtons.forEach(btn => btn.onclick = null);
+    
+    // Show correct answer
+    answerButtons.forEach((btn, index) => {
+      if (index === question.correct) {
+        btn.classList.add('correct');
+      } else if (index === selectedIndex && !isCorrect) {
+        btn.classList.add('wrong');
+      }
+    });
+    
+    if (isCorrect) {
+      gameState.correct++;
+      gameState.streak++;
+      gameState.bestStreak = Math.max(gameState.bestStreak, gameState.streak);
+      
+      // Calculate score - Capital raising emphasizes business knowledge
+      const basePoints = 130;
+      const timeBonus = Math.floor(gameState.timeLeft * 8);
+      const streakBonus = gameState.streak * difficulties[gameState.difficulty].streakBonus;
+      const difficultyMultiplier = difficulties[gameState.difficulty].scoreMultiplier;
+      
+      const points = Math.floor((basePoints + timeBonus + streakBonus) * difficultyMultiplier);
+      gameState.score += points;
+      
+      questionCard.classList.add('correct');
+      questionCard.classList.add('bounce');
+      
+    } else {
+      gameState.wrong++;
+      gameState.streak = 0;
+      questionCard.classList.add('wrong');
+      questionCard.classList.add('shake');
+    }
+    
+    gameState.currentQuestion++;
+    updateStats();
+    
+    // Show next question after delay
+    setTimeout(() => {
+      questionCard.classList.remove('bounce', 'shake');
+      showNextQuestion();
+    }, 2000);
+  }
+
+  function skipQuestion() {
+    selectAnswer(-1); // Treat skip as wrong answer
+  }
+
+  function endGame() {
+    // Hide game UI
+    document.getElementById('game-stats').style.display = 'none';
+    document.getElementById('question-container').style.display = 'none';
+    
+    // Show results
+    const gameOver = document.getElementById('game-over');
+    gameOver.style.display = 'block';
+    
+    document.getElementById('final-score').textContent = gameState.score.toLocaleString();
+    document.getElementById('final-correct').textContent = gameState.correct;
+    document.getElementById('final-wrong').textContent = gameState.wrong;
+    document.getElementById('final-streak').textContent = gameState.bestStreak;
+    
+    const avgTime = gameState.responseTimes.length > 0 
+      ? (gameState.responseTimes.reduce((a, b) => a + b, 0) / gameState.responseTimes.length).toFixed(1)
+      : '0';
+    document.getElementById('avg-time').textContent = avgTime + 's';
+    
+    // Performance message - Capital raising themed
+    const accuracy = (gameState.correct / gameState.totalQuestions) * 100;
+    let message = '';
+    if (accuracy >= 90) message = '💰 Capital Master! You could run a successful fundraise!';
+    else if (accuracy >= 80) message = '🚀 Great CEO! You understand the funding landscape!';
+    else if (accuracy >= 70) message = '📈 Solid founder! Review IPO processes and VC structures.';
+    else if (accuracy >= 60) message = '💼 Keep learning! Focus on underwriting and risk allocation.';
+    else message = '📚 Study up! Master the basics of bootstrapping and early funding.';
+    
+    document.getElementById('performance-msg').innerHTML = message;
+    
+    // Save to leaderboard
+    saveScore();
+  }
+
+  function resetGame() {
+    document.getElementById('game-over').style.display = 'none';
+    document.getElementById('game-start').style.display = 'block';
+    loadLeaderboard();
+  }
+
+  function saveScore() {
+    const scores = JSON.parse(localStorage.getItem('ch15_scores') || '[]');
+    const newScore = {
+      score: gameState.score,
+      difficulty: gameState.difficulty,
+      accuracy: Math.round((gameState.correct / gameState.totalQuestions) * 100),
+      avgTime: gameState.responseTimes.length > 0 ? 
+        (gameState.responseTimes.reduce((a, b) => a + b, 0) / gameState.responseTimes.length).toFixed(1) : '0',
+      date: new Date().toLocaleDateString()
+    };
+    
+    scores.push(newScore);
+    scores.sort((a, b) => b.score - a.score);
+    scores.splice(5); // Keep top 5
+    
+    localStorage.setItem('ch15_scores', JSON.stringify(scores));
+    loadLeaderboard();
+  }
+
+  function loadLeaderboard() {
+    const scores = JSON.parse(localStorage.getItem('ch15_scores') || '[]');
+    const leaderboard = document.getElementById('leaderboard-list');
+    
+    if (scores.length === 0) {
+      leaderboard.innerHTML = '<div class="lb-entry"><span>No deals yet!</span><span>Start your first fundraise!</span></div>';
+      return;
+    }
+    
+    leaderboard.innerHTML = scores.map((score, index) => `
+      <div class="lb-entry">
+        <span>#${index + 1} • ${score.score.toLocaleString()} pts (${score.accuracy}% in ${score.avgTime}s)</span>
+        <span>${score.difficulty.toUpperCase()} • ${score.date}</span>
+      </div>
+    `).join('');
+  }
+
+  function showLeaderboard() {
+    resetGame();
+  }
+
+  // Initialize leaderboard on page load
+  loadLeaderboard();
+
+  // IPO mini calc
+  function ipoCalc(){
+    const offer=+document.getElementById('offer').value||0;
+    const sh=+(document.getElementById('shares').value||0)*1e6;
+    const spr=(+document.getElementById('spread').value||0)/100;
+    const close=+document.getElementById('close').value||offer;
+    const issuer=offer*(1-spr)*sh;
+    const spread$=offer*spr*sh;
+    const mlot=(close-offer)*sh;
+    document.getElementById('ipoOut').innerHTML=
+      `Issuer proceeds: <b>$${(issuer/1e6).toFixed(2)}m</b> • Underwriter spread: <b>$${(spread$/1e6).toFixed(2)}m</b> • Money left on the table: <b>$${(mlot/1e6).toFixed(2)}m</b>`;
+  }
+</script>
+</body>
+</html>

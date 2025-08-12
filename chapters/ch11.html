@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Chapter 11 — Time Value of Money (TVM)</title>
+<style>
+  :root{
+    --bg:#0f1116; --panel:#141821; --sunken:#0b0e14;
+    --text:#ffffff; --muted:#a5b3d9; --accent:#7aa2f7; --good:#4ade80; --bad:#f87171; --warn:#facc15;
+    --card:#0f1522; --cardEdge:#1b2233; --chip:#192033;
+    --success:#34d399; --danger:#f87171;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:linear-gradient(180deg,var(--bg),#0c0f15 50%, var(--bg));
+    color:var(--text); font:15px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    display:flex; gap:0;
+  }
+  /* Sidebar */
+  .sidebar{
+    width:280px; background:var(--panel); border-right:1px solid #1d2332; padding:18px 12px; position:sticky; top:0; height:100vh; overflow:auto;
+  }
+  .brand{display:flex; align-items:center; gap:10px; padding:6px 10px 14px; border-bottom:1px solid #1c2230; margin-bottom:14px}
+  .brand .dot{width:10px; height:10px; border-radius:50%; background:conic-gradient(var(--accent), #8bd5ff)}
+  .brand h1{font-size:16px; margin:0; letter-spacing:.3px; color:#ffffff}
+  .tablist{display:flex; flex-direction:column; gap:8px; margin-top:10px}
+  .tabbtn{
+    text-align:left; width:100%; border:1px solid #20283a; background:var(--sunken);
+    color:var(--text); padding:10px 12px; border-radius:10px; cursor:pointer; transition:.15s ease;
+  }
+  .tabbtn:hover{border-color:#2a3550; transform:translateY(-1px)}
+  .tabbtn.active{background:#122038; border-color:#2b3f6b; box-shadow:0 0 0 2px #1f2a44 inset}
+  .small{color:var(--muted); font-size:12px}
+
+  /* Main */
+  .main{flex:1; min-width:0; padding:24px; overflow:auto}
+  .hero{
+    background:radial-gradient(1200px 400px at 20% -20%, #203255 0%, transparent 60%),
+               radial-gradient(800px 300px at 110% -30%, #1a263f 0%, transparent 70%);
+    border:1px solid #1c2436; border-radius:14px; padding:20px; margin-bottom:18px;
+  }
+  h2{margin:0 0 10px 0; font-size:22px; color:#ffffff}
+  h3{margin:22px 0 8px; font-size:18px; color:#ffffff}
+  p{margin:8px 0; color:#ffffff}
+  .chip{display:inline-block; background:var(--chip); border:1px solid #24304a; color:#ffffff; padding:4px 8px; border-radius:999px; font-size:12px; margin:2px 4px 2px 0}
+  .grid{display:grid; gap:14px}
+  .grid.cols-2{grid-template-columns:repeat(auto-fit, minmax(280px,1fr))}
+  .panel{background:var(--panel); border:1px solid #1c2436; border-radius:14px; padding:16px}
+  .callout{border-left:3px solid var(--accent); background:#0f1728; padding:10px 12px; border-radius:8px; color:#ffffff}
+  .katex{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
+  code, .monospace{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size:13px; color:#ffffff}
+  .muted{color:var(--muted)}
+
+  /* Cards */
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px}
+  .qcard{
+    perspective:1000px; height:150px;
+  }
+  .q-inner{position:relative; height:100%; transform-style:preserve-3d; transition:transform .55s cubic-bezier(.2,.7,.2,1)}
+  .qcard:hover .q-inner{transform:rotateY(180deg)}
+  .face{
+    position:absolute; inset:0; backface-visibility:hidden; background:var(--card); border:1px solid var(--cardEdge);
+    border-radius:14px; padding:14px; display:flex; align-items:center; justify-content:center; text-align:center; color:#ffffff
+  }
+  .face.back{transform:rotateY(180deg); background:#0f1626}
+  .face strong{color:#ffffff}
+
+  /* MCQs */
+  .mcq{background:var(--panel); border:1px solid #1c2436; border-radius:14px; padding:16px; margin:10px 0}
+  .mcq h4{margin:0 0 10px 0; color:#ffffff}
+  .opt{display:block; padding:8px 10px; margin:6px 0; border:1px solid #20283a; border-radius:10px; cursor:pointer; color:#ffffff}
+  .opt:hover{background:#101728}
+  .correct{border-color:#275b3c; background:#0f1b17}
+  .wrong{border-color:#5b2727; background:#1b0f10}
+  .explain{display:none; margin-top:8px; color:#ffffff}
+  .spacer{height:8px}
+  .solutions-block{display:none; padding:10px; border-top:1px dashed #2b3752; margin-top:8px; color:#ffffff}
+  .btn{background:#13213a; border:1px solid #273758; color:#ffffff; padding:8px 10px; border-radius:10px; cursor:pointer}
+  .btn:hover{background:#152747}
+
+  /* Short Qs & Practice */
+  details{background:var(--sunken); border:1px solid #23304a; border-radius:12px; padding:10px 12px; margin:10px 0}
+  summary{cursor:pointer; font-weight:600; color:#ffffff}
+  .solve{margin-top:8px; color:#ffffff}
+  .tag{font-size:11px; padding:2px 6px; border:1px solid #2a3552; background:#101727; border-radius:999px; color:#ffffff; margin-left:6px}
+
+  /* Tabs */
+  .tabcontent{display:none}
+  .tabcontent.active{display:block; animation:fade .25s ease}
+  @keyframes fade{from{opacity:.5; transform:translateY(2px)} to{opacity:1; transform:none}}
+
+  /* GAME STYLES */
+  .game-arena{text-align:center;max-width:800px;margin:0 auto}
+  .game-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+  .stat-card{background:linear-gradient(145deg,#0f1830,#1a2640);border:1px solid #1c2436;border-radius:12px;padding:1rem;text-align:center}
+  .stat-value{font-size:2rem;font-weight:700;color:var(--accent);margin:0}
+  .stat-label{font-size:.85rem;color:var(--muted);margin:.25rem 0 0}
+  .question-card{background:var(--card);border:2px solid #1c2436;border-radius:16px;padding:2rem;margin:1.5rem 0;min-height:200px;position:relative;overflow:hidden}
+  .question-card.correct{border-color:var(--success);background:linear-gradient(145deg,#0a1a0f,var(--card))}
+  .question-card.wrong{border-color:var(--danger);background:linear-gradient(145deg,#1a0a0a,var(--card))}
+  .question-text{font-size:1.25rem;font-weight:600;margin-bottom:1.5rem;line-height:1.4;color:#ffffff}
+  .answer-options{display:grid;gap:.75rem;max-width:500px;margin:0 auto}
+  .answer-btn{background:linear-gradient(145deg,#1a2640,#0f1830);border:2px solid #1c2436;color:#ffffff;padding:1rem;border-radius:12px;cursor:pointer;transition:all .2s;font-size:1rem;font-weight:500}
+  .answer-btn:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 12px rgba(122,162,247,.3)}
+  .answer-btn.correct{border-color:var(--success);background:linear-gradient(145deg,#0a1a0f,#1a4a2a)}
+  .answer-btn.wrong{border-color:var(--danger);background:linear-gradient(145deg,#1a0a0a,#4a1a1a)}
+  .timer-bar{height:6px;background:#1c2436;border-radius:3px;overflow:hidden;margin-bottom:1rem}
+  .timer-fill{height:100%;background:linear-gradient(90deg,var(--danger),#fbbf24,var(--success));transition:width .1s linear}
+  .streak-indicator{position:absolute;top:1rem;right:1rem;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a1020;padding:.5rem 1rem;border-radius:999px;font-weight:700;font-size:.9rem}
+  .game-over{text-align:center;padding:2rem}
+  .final-score{font-size:3rem;font-weight:700;color:var(--accent);margin:1rem 0}
+  .performance{margin:1.5rem 0}
+  .perf-item{display:inline-block;margin:.5rem 1rem;font-size:1.1rem;color:#ffffff}
+  .leaderboard{background:var(--card);border-radius:12px;padding:1.5rem;margin-top:1.5rem}
+  .lb-entry{display:flex;justify-content:space-between;padding:.75rem 0;border-bottom:1px solid #1c2436;color:#ffffff}
+  .lb-entry:last-child{border-bottom:none}
+  .difficulty-select{margin-bottom:1.5rem}
+  .diff-btn{margin:0 .5rem;padding:.75rem 1.5rem;border-radius:8px;cursor:pointer;border:2px solid #1c2436;background:var(--panel);color:#ffffff}
+  .diff-btn.active{border-color:var(--accent);background:linear-gradient(145deg,#8bd5ff,var(--accent));color:#0a1020}
+
+  /* Animations */
+  @keyframes bounce{0%,20%,50%,80%,100%{transform:translateY(0)}40%{transform:translateY(-10px)}60%{transform:translateY(-5px)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}10%,30%,50%,70%,90%{transform:translateX(-5px)}20%,40%,60%,80%{transform:translateX(5px)}}
+  .bounce{animation:bounce .5s ease}
+  .shake{animation:shake .5s ease}
+
+  @media (max-width:940px){
+    .sidebar{position:fixed; inset:0 auto 0 0; z-index:40; transform:translateX(-100%); transition:.2s ease}
+    .sidebar.show{transform:none}
+    .main{padding:16px}
+    .toggleNav{position:fixed; top:12px; left:12px; z-index:50}
+  }
+
+  /* Additional styling */
+  ul{color:#ffffff}
+  li{color:#ffffff; margin:.25rem 0}
+  .badge{font-size:11px; padding:2px 6px; border:1px solid #2a3552; background:#101727; border-radius:999px; color:#ffffff; margin-left:6px}
+</style>
+</head>
+<body>
+  <button class="btn toggleNav" type="button" onclick="toggleNav()" aria-label="Toggle navigation">☰</button>
+  <aside class="sidebar" id="nav" aria-label="Lesson navigation">
+    <div class="brand"><span class="dot" aria-hidden="true"></span><h1>FIN 311 • Ch.11 Time Value of Money</h1></div>
+    <div class="tablist" role="tablist">
+      <button class="tabbtn active" role="tab" aria-selected="true" onclick="showTab('review')">📘 Review</button>
+      <button class="tabbtn" role="tab" aria-selected="false" onclick="showTab('qcards')">🧠 Q-cards</button>
+      <button class="tabbtn" role="tab" aria-selected="false" onclick="showTab('mcqs')">📝 MCQs</button>
+      <button class="tabbtn" role="tab" aria-selected="false" onclick="showTab('shorts')">✍️ Short Questions</button>
+      <button class="tabbtn" role="tab" aria-selected="false" onclick="showTab('practice')">📊 Practice Problems</button>
+      <button class="tabbtn" role="tab" aria-selected="false" onclick="showTab('game')">🎮 TVM Challenge</button>
+      <div class="small" style="margin-top:10px">
+        Master the time value of money concepts through speed challenges and interactive practice.
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- REVIEW -->
+    <section id="review" class="tabcontent active" role="tabpanel">
+      <div class="hero">
+        <h2>Chapter 11 — Time Value of Money (TVM)</h2>
+        <div class="muted">Master fundamental TVM concepts: present value, future value, annuities, and perpetuities.</div>
+        <div style="margin-top:10px">
+          <span class="chip">PV/FV</span><span class="chip">Compound Interest</span><span class="chip">Annuities</span><span class="chip">Perpetuities</span>
+          <span class="chip">EAR vs APR</span><span class="chip">Loan Amortization</span>
+        </div>
+      </div>
+
+      <div class="grid cols-2">
+        <div class="panel">
+          <h3>1) Core concepts</h3>
+          <ul>
+            <li><strong>TVM principle:</strong> A dollar today > a dollar tomorrow because it can earn interest; always line up timing.</li>
+            <li><strong>Compound interest:</strong> interest earns interest. <code>FV = PV(1+r)^n</code>.</li>
+            <li><strong>Discounting:</strong> bring future cash flows to today. <code>PV = FV / (1+r)^n</code>.</li>
+            <li><strong>Effective vs APR:</strong> <code>EAR = (1+APR/m)^m - 1</code>; compounding frequency matters.</li>
+            <li><strong>Annuities:</strong> level payments:
+              <ul class="small">
+                <li>Ordinary annuity (end-of-period): <code>PV = PMT×[1-(1+r)^-n]/r</code></li>
+                <li>Annuity-due (beginning): multiply OA by <code>(1+r)</code></li>
+                <li>Growing annuity (rate g): <code>PV = PMT₁×[1-(1+g)^n/(1+r)^n]/(r-g)</code></li>
+              </ul>
+            </li>
+            <li><strong>Perpetuities:</strong> forever payments. Level: <code>PV = PMT/r</code>; growing: <code>PV = PMT₁/(r-g)</code>.</li>
+            <li><strong>Loan amortization:</strong> use annuity formulas to find payment; interest portion declines over time.</li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <h3>2) Mini-examples</h3>
+          <p><strong>FV single sum:</strong> $3,000 at 7% for 6 years → <code>3000×1.07^6 = $4,501</code>.</p>
+          <p><strong>PV single sum:</strong> Need $10,000 in 4 years at 8% → <code>10000/1.08^4 = $7,350</code>.</p>
+          <p><strong>PV OA:</strong> $500 each year for 5 years, r=9% → <code>500×[1-1/1.09^5]/0.09 = $1,955</code>.</p>
+          <p><strong>EAR from APR:</strong> APR 12% monthly → <code>(1+0.12/12)^12 -1 = 12.68%</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Q-CARDS -->
+    <section id="qcards" class="tabcontent" role="tabpanel" aria-hidden="true">
+      <div class="panel">
+        <h3>Flip Q-cards — Chapter 11 core terms</h3>
+        <div class="cards">
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>Future Value (single sum)</strong></div>
+            <div class="face back"><code>FV = PV(1+r)^n</code>. "Roll" today's $ forward at rate r for n periods.</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>Present Value (single sum)</strong></div>
+            <div class="face back"><code>PV = FV/(1+r)^n</code>. Discount future $ back at rate r.</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>EAR vs APR</strong></div>
+            <div class="face back"><code>EAR = (1+APR/m)^m - 1</code>. Use EAR to compare loans/investments.</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>PV of ordinary annuity</strong></div>
+            <div class="face back"><code>PV = PMT×[1-(1+r)^-n]/r</code>. End-of-period cash flows.</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>Annuity-due tweak</strong></div>
+            <div class="face back">Multiply OA result by <code>(1+r)</code> (payment at the start of each period).</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>Perpetuity</strong></div>
+            <div class="face back">Level forever: <code>PV = PMT/r</code>. Growing: <code>PV = PMT₁/(r-g)</code>.</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>Loan payment (amortizing)</strong></div>
+            <div class="face back"><code>PMT = PV×[r / (1 - (1+r)^-n)]</code>.</div>
+          </div></div>
+
+          <div class="qcard"><div class="q-inner">
+            <div class="face"><strong>Timing warning</strong></div>
+            <div class="face back">Match compounding to cash-flow timing (annual vs semiannual vs monthly).</div>
+          </div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MCQS -->
+    <section id="mcqs" class="tabcontent" role="tabpanel" aria-hidden="true">
+      <div class="panel">
+        <h3>MCQs — Time Value of Money</h3>
+
+        <div class="mcq">
+          <h4>1) Which raises EAR holding APR fixed?</h4>
+          <label class="opt"><input type="radio" name="m1">Lower compounding frequency</label>
+          <label class="opt" data-correct="1"><input type="radio" name="m1">Higher compounding frequency</label>
+          <label class="opt"><input type="radio" name="m1">EAR is independent of compounding</label>
+          <div class="explain">More frequent compounding increases EAR for given APR.</div>
+        </div>
+
+        <div class="mcq">
+          <h4>2) PV of $10,000 received in 4 years at 8% (annual) is closest to:</h4>
+          <label class="opt"><input type="radio" name="m2">$6,802</label>
+          <label class="opt" data-correct="1"><input type="radio" name="m2">$7,350</label>
+          <label class="opt"><input type="radio" name="m2">$7,900</label>
+          <div class="explain">PV = 10000/(1.08)^4 = $7,350.</div>
+        </div>
+
+        <div class="mcq">
+          <h4>3) An annuity-due differs from an ordinary annuity because payments are made at the…</h4>
+          <label class="opt"><input type="radio" name="m3">Middle of each period</label>
+          <label class="opt" data-correct="1"><input type="radio" name="m3">Beginning of each period</label>
+          <label class="opt"><input type="radio" name="m3">End of each period</label>
+          <div class="explain">Annuity-due = beginning of period payments.</div>
+        </div>
+
+        <div class="mcq">
+          <h4>4) With a fixed-rate amortizing loan, the interest portion of each payment generally:</h4>
+          <label class="opt" data-correct="1"><input type="radio" name="m4">Decreases over time</label>
+          <label class="opt"><input type="radio" name="m4">Increases over time</label>
+          <label class="opt"><input type="radio" name="m4">Stays constant</label>
+          <div class="explain">As principal is paid down, interest portion decreases.</div>
+        </div>
+
+        <div class="mcq">
+          <h4>5) APR 12% compounded monthly ⇒ EAR is closest to:</h4>
+          <label class="opt" data-correct="1"><input type="radio" name="m5">12.68%</label>
+          <label class="opt"><input type="radio" name="m5">12.00%</label>
+          <label class="opt"><input type="radio" name="m5">12.36%</label>
+          <div class="explain">EAR = (1+0.12/12)^12 - 1 = 12.68%.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SHORT QUESTIONS -->
+    <section id="shorts" class="tabcontent" role="tabpanel" aria-hidden="true">
+      <div class="panel">
+        <h3>Short Questions — applied numericals</h3>
+
+        <details><summary><strong>S1) Lump-sum PV</strong> — Receive $25,000 in 6 years, r=7% (annual). <span class="badge">TVM</span></summary>
+          <div class="solve"><strong>Solution:</strong> <code>PV = 25000/(1.07)^6 = $16,661</code> (approx).</div>
+        </details>
+
+        <details><summary><strong>S2) OA PV</strong> — $1,200 at year-end for 10 years, r=6%. <span class="badge">Annuity</span></summary>
+          <div class="solve"><strong>Solution:</strong> <code>PV = 1200×[1-(1.06)^-10]/0.06 = $8,832</code>.</div>
+        </details>
+
+        <details><summary><strong>S3) Annuity-due FV</strong> — $300 monthly starting today for 3 years, APR 6% (m=12). <span class="badge">Annuity-Due</span></summary>
+          <div class="solve"><strong>Solution:</strong> First OA FV: <code>300×[(1.005)^36-1]/0.005 ≈ $71,801</code>; annuity-due ×1.005 ⇒ <strong>$72,160</strong>.</div>
+        </details>
+
+        <details><summary><strong>S4) Loan payment</strong> — Borrow $40,000 for 5 years at APR 8% (monthly). <span class="badge">Loan</span></summary>
+          <div class="solve"><strong>Solution:</strong> <code>PMT = 40000×[0.0066667/(1-(1.0066667)^-60)] ≈ $880.80</code>.</div>
+        </details>
+
+        <details><summary><strong>S5) EAR</strong> — APR 18% compounded quarterly. <span class="badge">Rates</span></summary>
+          <div class="solve"><strong>Solution:</strong> <code>EAR=(1+0.18/4)^4-1 = 19.25%</code>.</div>
+        </details>
+      </div>
+    </section>
+
+    <!-- PRACTICE PROBLEMS -->
+    <section id="practice" class="tabcontent" role="tabpanel" aria-hidden="true">
+      <div class="panel">
+        <h3>Practice Problems — with solutions</h3>
+
+        <details><summary><strong>5.1 Future value</strong> — $10,000 at 9% for 5 years</summary>
+          <div class="solve">
+            <strong>Setup:</strong> <code>FV = PV(1+r)^n = 10000×1.09^5</code>.<br/>
+            <strong>Answer:</strong> <strong>$15,386.24</strong>.
+          </div>
+        </details>
+
+        <details><summary><strong>5.2 Present value</strong> — Need $50,000 in 6 years at 7.25%</summary>
+          <div class="solve">
+            <code>PV = 50000 / (1.0725)^6 =</code> <strong>$32,838.58</strong>.
+          </div>
+        </details>
+
+        <details><summary><strong>5.3 Compounding frequency</strong> — $10,000 for 5 years at 4%: annual vs semiannual vs quarterly</summary>
+          <div class="solve">
+            Bank A (annual): <code>10000×(1+0.04/1)^(1×5) = $12,166.53</code><br/>
+            Bank B (semiannual): <code>10000×(1+0.04/2)^(2×5) = $12,189.94</code><br/>
+            Bank C (quarterly): <code>10000×(1+0.04/4)^(4×5) = $12,201.90</code>.
+          </div>
+        </details>
+
+        <details><summary><strong>5.4 Solve for rate</strong> — Invest $2,500 today to receive $3,000 in 3 years</summary>
+          <div class="solve">
+            <code>3000 = 2500(1+i)^3 ⇒ (1+i)^3=1.2 ⇒ i = 1.2^(1/3)−1 = 0.0627</code>.<br/>
+            <strong>Answer:</strong> <strong>6.27%</strong> per year (annual compounding).
+          </div>
+        </details>
+
+        <details><summary><strong>5.5 Simple vs compound interest</strong> — $1,200 for 5 years at 4%</summary>
+          <div class="solve">
+            (a) Simple interest: <code>I = PV×r×n = 1200×0.04×5 = $240</code>; FV = $1,440.<br/>
+            (b) Compound annually: <code>FV = 1200×1.04^5 = $1,459.98 ≈ $1,460</code>.<br/>
+            (c) Interest-on-interest = compound interest − simple interest = <code>($1,460−1,200) − $240 = $20</code>.
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- TVM SPEED CHALLENGE GAME -->
+    <section id="game" class="tabcontent" role="tabpanel" aria-hidden="true">
+      <div class="panel">
+        <h1>🎮 Time Value of Money Challenge</h1>
+        <p class="muted">Master TVM with lightning-fast calculations! Build streaks and climb the leaderboard.</p>
+        
+        <div class="game-arena">
+          <!-- Game Start Screen -->
+          <div id="game-start" class="game-over">
+            <h2>⚡ Ready for TVM Speed Training?</h2>
+            <div class="difficulty-select">
+              <h3>Choose Your Challenge:</h3>
+              <button class="diff-btn active" data-diff="easy">Rookie<br><small>18s • Basic calculations</small></button>
+              <button class="diff-btn" data-diff="medium">Expert<br><small>12s • Mixed problems</small></button>
+              <button class="diff-btn" data-diff="hard">Master<br><small>8s • Complex scenarios</small></button>
+            </div>
+            <button class="btn" onclick="startGame()">🚀 Start Challenge</button>
+            
+            <!-- Leaderboard -->
+            <div class="leaderboard">
+              <h3>🏆 Hall of Fame</h3>
+              <div id="leaderboard-list">
+                <div class="lb-entry"><span>Ready for your first challenge?</span><span>Set the pace!</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Game Stats -->
+          <div id="game-stats" class="game-stats" style="display:none">
+            <div class="stat-card">
+              <div class="stat-value" id="score">0</div>
+              <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="streak">0</div>
+              <div class="stat-label">Streak</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="correct">0</div>
+              <div class="stat-label">Correct</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="remaining">12</div>
+              <div class="stat-label">Remaining</div>
+            </div>
+          </div>
+
+          <!-- Question Card -->
+          <div id="question-container" style="display:none">
+            <div class="timer-bar">
+              <div class="timer-fill" id="timer-fill"></div>
+            </div>
+            
+            <div class="question-card" id="question-card">
+              <div class="streak-indicator" id="streak-display" style="display:none">🔥 <span id="streak-num">0</span></div>
+              <div class="question-text" id="question-text"></div>
+              <div class="answer-options" id="answer-options"></div>
+            </div>
+            
+            <button class="btn ghost" onclick="skipQuestion()">⏭️ Skip</button>
+          </div>
+
+          <!-- Game Over Screen -->
+          <div id="game-over" class="game-over" style="display:none">
+            <h2>🎯 Challenge Complete!</h2>
+            <div class="final-score" id="final-score">0</div>
+            <div class="performance">
+              <div class="perf-item">✅ <strong id="final-correct">0</strong> Correct</div>
+              <div class="perf-item">❌ <strong id="final-wrong">0</strong> Wrong</div>
+              <div class="perf-item">🔥 Best Streak: <strong id="final-streak">0</strong></div>
+              <div class="perf-item">⚡ Avg: <strong id="avg-time">0s</strong></div>
+            </div>
+            <div class="performance-message" id="performance-msg"></div>
+            <button class="btn" onclick="resetGame()">🔄 Play Again</button>
+            <button class="btn ghost" onclick="showLeaderboard()">📊 Leaderboard</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+<script>
+  function toggleNav(){ document.getElementById('nav').classList.toggle('show'); }
+  function showTab(id){
+    document.querySelectorAll('.tabbtn').forEach(b=>{ b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+    document.querySelectorAll('.tabcontent').forEach(s=>{ s.classList.remove('active'); s.setAttribute('aria-hidden','true'); });
+    document.querySelector('[onclick="showTab(\''+id+'\')"]').classList.add('active');
+    document.querySelector('[onclick="showTab(\''+id+'\')"]').setAttribute('aria-selected','true');
+    document.getElementById(id).classList.add('active');
+    document.getElementById(id).setAttribute('aria-hidden','false');
+    if(innerWidth<940) document.getElementById('nav').classList.remove('show');
+  }
+
+  // MCQ interactions
+  document.querySelectorAll('.mcq').forEach(block=>{
+    block.querySelectorAll('.opt').forEach(opt=>{
+      opt.addEventListener('click',()=>{
+        block.querySelectorAll('.opt').forEach(o=>{ o.classList.remove('correct','wrong'); });
+        if(opt.dataset.correct==='1'){ opt.classList.add('correct'); } else { opt.classList.add('wrong'); }
+        block.querySelector('.explain').style.display='block';
+      });
+    });
+  });
+
+  // Difficulty buttons
+  document.querySelectorAll('.diff-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // TVM Speed Challenge Game
+  let gameState = {
+    score: 0,
+    streak: 0,
+    bestStreak: 0,
+    correct: 0,
+    wrong: 0,
+    currentQuestion: 0,
+    totalQuestions: 12,
+    difficulty: 'easy',
+    timer: null,
+    timeLeft: 18,
+    questionStartTime: 0,
+    responseTimes: []
+  };
+
+  const difficulties = {
+    easy: { time: 18, scoreMultiplier: 1, streakBonus: 15 },
+    medium: { time: 12, scoreMultiplier: 1.5, streakBonus: 20 },
+    hard: { time: 8, scoreMultiplier: 2.2, streakBonus: 30 }
+  };
+
+  // TVM Question bank - mix of calculations and concepts
+  const questions = [
+    {
+      text: "FV of $5,000 at 8% for 10 years = ?",
+      answers: ["$10,794", "$11,500", "$9,800", "$12,200"],
+      correct: 0,
+      explanation: "FV = PV(1+r)^n = $5,000(1.08)^10 = $10,794"
+    },
+    {
+      text: "PV of $15,000 in 5 years at 7% = ?",
+      answers: ["$10,499", "$10,700", "$11,200", "$9,800"],
+      correct: 0,
+      explanation: "PV = FV/(1+r)^n = $15,000/(1.07)^5 = $10,499"
+    },
+    {
+      text: "APR 18% quarterly. EAR = ?",
+      answers: ["18.00%", "19.25%", "19.67%", "20.12%"],
+      correct: 1,
+      explanation: "EAR = (1+0.18/4)^4 - 1 = 19.25%"
+    },
+    {
+      text: "PV of $1,000 annuity for 6 years at 9% = ?",
+      answers: ["$4,486", "$4,200", "$4,800", "$5,100"],
+      correct: 0,
+      explanation: "PV = PMT[1-(1+r)^-n]/r = $1,000[1-1.09^-6]/0.09 = $4,486"
+    },
+    {
+      text: "Monthly payment on $50k loan, 5 years, 6% APR = ?",
+      answers: ["$933", "$966", "$1,000", "$895"],
+      correct: 1,
+      explanation: "Monthly rate = 6%/12 = 0.5%. PMT = $50k × [0.005/(1-1.005^-60)] = $966"
+    },
+    {
+      text: "Which gives highest FV: $100 at 8% annual vs 7.8% quarterly for 4 years?",
+      answers: ["8% annual", "7.8% quarterly", "Same", "Cannot tell"],
+      correct: 1,
+      explanation: "7.8% quarterly gives EAR = 8.03% > 8% annual"
+    },
+    {
+      text: "FV of annuity-due: $500 quarterly for 3 years at 8% = ?",
+      answers: ["$6,515", "$6,728", "$6,892", "$7,100"],
+      correct: 1,
+      explanation: "Ordinary annuity FV × (1+r) where r = 8%/4 = 2%"
+    },
+    {
+      text: "PV of perpetuity paying $2,000 annually at 10% = ?",
+      answers: ["$18,000", "$20,000", "$22,000", "$25,000"],
+      correct: 1,
+      explanation: "PV = PMT/r = $2,000/0.10 = $20,000"
+    },
+    {
+      text: "Growing perpetuity: $1,000 first payment, 3% growth, 12% rate = ?",
+      answers: ["$11,111", "$8,333", "$13,889", "$9,722"],
+      correct: 0,
+      explanation: "PV = PMT₁/(r-g) = $1,000/(0.12-0.03) = $11,111"
+    },
+    {
+      text: "Years to double money at 9% annually = ?",
+      answers: ["7.7 years", "8.0 years", "8.5 years", "9.2 years"],
+      correct: 0,
+      explanation: "Rule of 72: 72/9 ≈ 8 years. Exact: ln(2)/ln(1.09) = 7.7 years"
+    },
+    {
+      text: "Effective rate for APR 12% with daily compounding = ?",
+      answers: ["12.68%", "12.75%", "12.83%", "13.00%"],
+      correct: 1,
+      explanation: "EAR = (1+0.12/365)^365 - 1 = 12.75%"
+    },
+    {
+      text: "PV of $800 monthly payments for 2 years at 6% APR = ?",
+      answers: ["$18,227", "$18,500", "$17,900", "$19,100"],
+      correct: 0,
+      explanation: "Monthly rate = 0.5%. PV = $800[1-1.005^-24]/0.005 = $18,227"
+    }
+  ];
+
+  function startGame() {
+    const selectedDiff = document.querySelector('.diff-btn.active').dataset.diff;
+    gameState.difficulty = selectedDiff;
+    gameState.timeLeft = difficulties[selectedDiff].time;
+    
+    // Reset game state
+    gameState.score = 0;
+    gameState.streak = 0;
+    gameState.bestStreak = 0;
+    gameState.correct = 0;
+    gameState.wrong = 0;
+    gameState.currentQuestion = 0;
+    gameState.responseTimes = [];
+    
+    // Shuffle questions
+    gameState.questions = [...questions].sort(() => Math.random() - 0.5).slice(0, gameState.totalQuestions);
+    
+    // Show game UI
+    document.getElementById('game-start').style.display = 'none';
+    document.getElementById('game-stats').style.display = 'grid';
+    document.getElementById('question-container').style.display = 'block';
+    
+    updateStats();
+    showNextQuestion();
+  }
+
+  function updateStats() {
+    document.getElementById('score').textContent = gameState.score.toLocaleString();
+    document.getElementById('streak').textContent = gameState.streak;
+    document.getElementById('correct').textContent = gameState.correct;
+    document.getElementById('remaining').textContent = gameState.totalQuestions - gameState.currentQuestion;
+  }
+
+  function showNextQuestion() {
+    if (gameState.currentQuestion >= gameState.totalQuestions) {
+      endGame();
+      return;
+    }
+    
+    const question = gameState.questions[gameState.currentQuestion];
+    const questionCard = document.getElementById('question-card');
+    
+    // Reset card styling
+    questionCard.className = 'question-card';
+    
+    // Set question text
+    document.getElementById('question-text').textContent = question.text;
+    
+    // Create answer options
+    const optionsContainer = document.getElementById('answer-options');
+    optionsContainer.innerHTML = '';
+    
+    question.answers.forEach((answer, index) => {
+      const button = document.createElement('button');
+      button.className = 'answer-btn';
+      button.textContent = answer;
+      button.onclick = () => selectAnswer(index);
+      optionsContainer.appendChild(button);
+    });
+    
+    // Update streak display
+    const streakDisplay = document.getElementById('streak-display');
+    if (gameState.streak > 0) {
+      streakDisplay.style.display = 'block';
+      document.getElementById('streak-num').textContent = gameState.streak;
+    } else {
+      streakDisplay.style.display = 'none';
+    }
+    
+    // Start timer
+    startTimer();
+    gameState.questionStartTime = Date.now();
+  }
+
+  function startTimer() {
+    gameState.timeLeft = difficulties[gameState.difficulty].time;
+    updateTimerBar();
+    
+    gameState.timer = setInterval(() => {
+      gameState.timeLeft--;
+      updateTimerBar();
+      
+      if (gameState.timeLeft <= 0) {
+        clearInterval(gameState.timer);
+        selectAnswer(-1); // Time up = wrong answer
+      }
+    }, 1000);
+  }
+
+  function updateTimerBar() {
+    const maxTime = difficulties[gameState.difficulty].time;
+    const percentage = (gameState.timeLeft / maxTime) * 100;
+    document.getElementById('timer-fill').style.width = percentage + '%';
+  }
+
+  function selectAnswer(selectedIndex) {
+    clearInterval(gameState.timer);
+    
+    const responseTime = (Date.now() - gameState.questionStartTime) / 1000;
+    gameState.responseTimes.push(responseTime);
+    
+    const question = gameState.questions[gameState.currentQuestion];
+    const isCorrect = selectedIndex === question.correct;
+    const questionCard = document.getElementById('question-card');
+    const answerButtons = document.querySelectorAll('.answer-btn');
+    
+    // Disable all buttons
+    answerButtons.forEach(btn => btn.onclick = null);
+    
+    // Show correct answer
+    answerButtons.forEach((btn, index) => {
+      if (index === question.correct) {
+        btn.classList.add('correct');
+      } else if (index === selectedIndex && !isCorrect) {
+        btn.classList.add('wrong');
+      }
+    });
+    
+    if (isCorrect) {
+      gameState.correct++;
+      gameState.streak++;
+      gameState.bestStreak = Math.max(gameState.bestStreak, gameState.streak);
+      
+      // Calculate score - TVM gets bonus for speed since calculations matter
+      const basePoints = 120;
+      const timeBonus = Math.floor(gameState.timeLeft * 8);
+      const streakBonus = gameState.streak * difficulties[gameState.difficulty].streakBonus;
+      const difficultyMultiplier = difficulties[gameState.difficulty].scoreMultiplier;
+      
+      const points = Math.floor((basePoints + timeBonus + streakBonus) * difficultyMultiplier);
+      gameState.score += points;
+      
+      questionCard.classList.add('correct');
+      questionCard.classList.add('bounce');
+      
+    } else {
+      gameState.wrong++;
+      gameState.streak = 0;
+      questionCard.classList.add('wrong');
+      questionCard.classList.add('shake');
+    }
+    
+    gameState.currentQuestion++;
+    updateStats();
+    
+    // Show next question after delay
+    setTimeout(() => {
+      questionCard.classList.remove('bounce', 'shake');
+      showNextQuestion();
+    }, 2000);
+  }
+
+  function skipQuestion() {
+    selectAnswer(-1); // Treat skip as wrong answer
+  }
+
+  function endGame() {
+    // Hide game UI
+    document.getElementById('game-stats').style.display = 'none';
+    document.getElementById('question-container').style.display = 'none';
+    
+    // Show results
+    const gameOver = document.getElementById('game-over');
+    gameOver.style.display = 'block';
+    
+    document.getElementById('final-score').textContent = gameState.score.toLocaleString();
+    document.getElementById('final-correct').textContent = gameState.correct;
+    document.getElementById('final-wrong').textContent = gameState.wrong;
+    document.getElementById('final-streak').textContent = gameState.bestStreak;
+    
+    const avgTime = gameState.responseTimes.length > 0 
+      ? (gameState.responseTimes.reduce((a, b) => a + b, 0) / gameState.responseTimes.length).toFixed(1)
+      : '0';
+    document.getElementById('avg-time').textContent = avgTime + 's';
+    
+    // Performance message - TVM themed
+    const accuracy = (gameState.correct / gameState.totalQuestions) * 100;
+    let message = '';
+    if (accuracy >= 90) message = '🧮 Calculator Master! You\'ve got TVM down to a science!';
+    else if (accuracy >= 80) message = '⚡ Speed Demon! Your calculations are lightning fast!';
+    else if (accuracy >= 70) message = '💪 Getting there! Keep practicing those formulas.';
+    else if (accuracy >= 60) message = '📚 Study tip: Master the basic formulas first.';
+    else message = '🎯 Don\'t give up! TVM takes practice - you\'ll get it!';
+    
+    document.getElementById('performance-msg').innerHTML = message;
+    
+    // Save to leaderboard
+    saveScore();
+  }
+
+  function resetGame() {
+    document.getElementById('game-over').style.display = 'none';
+    document.getElementById('game-start').style.display = 'block';
+    loadLeaderboard();
+  }
+
+  function saveScore() {
+    const scores = JSON.parse(localStorage.getItem('ch11_scores') || '[]');
+    const newScore = {
+      score: gameState.score,
+      difficulty: gameState.difficulty,
+      accuracy: Math.round((gameState.correct / gameState.totalQuestions) * 100),
+      avgTime: gameState.responseTimes.length > 0 ? 
+        (gameState.responseTimes.reduce((a, b) => a + b, 0) / gameState.responseTimes.length).toFixed(1) : '0',
+      date: new Date().toLocaleDateString()
+    };
+    
+    scores.push(newScore);
+    scores.sort((a, b) => b.score - a.score);
+    scores.splice(5); // Keep top 5
+    
+    localStorage.setItem('ch11_scores', JSON.stringify(scores));
+    loadLeaderboard();
+  }
+
+  function loadLeaderboard() {
+    const scores = JSON.parse(localStorage.getItem('ch11_scores') || '[]');
+    const leaderboard = document.getElementById('leaderboard-list');
+    
+    if (scores.length === 0) {
+      leaderboard.innerHTML = '<div class="lb-entry"><span>Ready for your first challenge?</span><span>Set the pace!</span></div>';
+      return;
+    }
+    
+    leaderboard.innerHTML = scores.map((score, index) => `
+      <div class="lb-entry">
+        <span>#${index + 1} • ${score.score.toLocaleString()} pts (${score.accuracy}% in ${score.avgTime}s)</span>
+        <span>${score.difficulty.toUpperCase()} • ${score.date}</span>
+      </div>
+    `).join('');
+  }
+
+  function showLeaderboard() {
+    resetGame();
+  }
+
+  // Initialize leaderboard on page load
+  loadLeaderboard();
+</script>
+</body>
+</html>
